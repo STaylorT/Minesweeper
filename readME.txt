@@ -19,3 +19,8 @@ To remove a flag, the player can right click on the flagged cell.
 Options:
 The default grid size is 9x9. The player can choose 3 pre-defined modes (easy, medium, hard) or can select her own custom size and mine
 percentage.
+
+
+Improvements to be made:
+- Store images in Grid class instead of Cell class so there aren't so many loaded images being unused
+- Enhance UI, especially after game loss / win.
