@@ -5,14 +5,14 @@ import javax.swing.*;
 
 public class Cell extends JButton{
     // is cell a mine?
-    private static boolean mine = false;
+    private boolean mine = false;
     // position on grid
     private int rowPosition;
     private int colPosition;
     // unique id
     private int id = 0;
     private static int ID_COUNT = 0;
-    // state of icon
+    // state of icon => "default"  |  "flagged"   |  "mine"  | "blank"  |  "num"
     private String iconState = "default";
 
     //scoreboard
@@ -21,24 +21,29 @@ public class Cell extends JButton{
     private ImageIcon defaultIcon = new ImageIcon("images/square.png");
     private ImageIcon mineIcon = new ImageIcon("images/bomb.png");
     private ImageIcon flagIcon = new ImageIcon("images/flag.png");
+    private ImageIcon noMineCell = new ImageIcon("images/nomine.png");
     private ImageIcon numberIcons[];
 
     public Cell(int row_pos, int col_pos, int num_rows, int num_cols, Scoreboard score_board){
         rowPosition = row_pos;
         colPosition = col_pos;
         scoreboard = score_board;
-        this.setIcon(defaultIcon);
         this.setBackground(Color.gray);
         setUpIcons();
-        id = ID_COUNT;
+        this.setIcon(defaultIcon);
+        // set id's for cells
         ID_COUNT++;
+        id = ID_COUNT;
+        if (ID_COUNT == num_rows * num_cols) // if we have filled the grid, reset id_count
+            ID_COUNT = 0;
     }
 
     // set number icons 1-8 in array
     private void setUpIcons(){
         numberIcons = new ImageIcon[8];
         for (int i=0 ; i< numberIcons.length ; i++){
-            numberIcons[i] = new ImageIcon("images/" + i+1 + ".png");
+            int b = i+1;
+            numberIcons[i] = new ImageIcon("images/" + b + ".png");
         }
     }
 
@@ -46,45 +51,76 @@ public class Cell extends JButton{
     public void setMine(boolean bool){
         mine = bool;
     }
+
     public int click(boolean isRightClick, Scoreboard scoreboard, boolean firstClick){ // -1 = game over | 0 = first click
         if (isRightClick){ // if the click was a right click
-            // set flag icon if not already set
-            if (iconState == "default"){
-                setFlag();
-            }
-            else if (iconState == "flagged"){
-                this.setIcon(defaultIcon);
-                iconState = "default";
-                scoreboard.addFlag();
-            }
+            // handle setting flag
+            setFlag();
         }
-        else{ // click was a left click (oooo)
+        else if (iconState != "flagged"){ // click was a left click (oooo)
             if (firstClick){ // user's first click
-                return id;
+                return id; // return the id of the cell clicked
             }
             else if (mine == true){ // user hit a mine, oops
                 return -1;
             }
-            else{ // user clicked any old cell
-                clickCell();
-
+            else if (this.isEnabled()){ // user clicked any old cell
+                return 0;
             }
         }
-        return 0;
-    }
-
-    private int clickCell(){ // handle clicking on cell
-        return 1;
+        return -2;
     }
 
     public void setFlag(){
-        this.setIcon(flagIcon);
-        iconState = "flagged";
-        scoreboard.removeFlag();
+        if (iconState == "default"){
+            this.setDisabledIcon(flagIcon);
+            this.setEnabled(false);
+            iconState = "flagged";
+            scoreboard.removeFlag();
+            return;
+        }
+        else if (iconState == "flagged"){
+            this.setEnabled(true);
+            this.setIcon(defaultIcon);
+            iconState = "default";
+            scoreboard.addFlag();
+            return;
+        }
     }
 
     // get ID of the cell in the grid
     public int getId(){
         return id;
     }
+    public void setIcon(int code){
+        if (code > 0){ // cell is 1-8
+            this.setDisabledIcon(numberIcons[code-1]);
+            this.setEnabled(false);
+            iconState = "num";
+        }
+        else if (code == 0){ // cell is blank
+            this.setDisabledIcon(noMineCell);
+            this.setEnabled(false);
+            iconState = "blank";
+        }
+        else if (code == -1){ // cell is mine
+            this.setDisabledIcon(mineIcon);
+            this.setEnabled(false);
+            iconState = "mine";
+        }
+    }
+    public void disableButton(){
+//        setDisabledIcon(this.getIcon());
+//        System.out.print(this.getIcon());
+        this.setEnabled(false);
+    }
+
+    public boolean hasMine(){ // for classes to see if this cell is a mine
+        return mine;
+    }
+
+    public String getState(){ // for classes to see the state of the cell
+        return iconState;
+    }
+
 }

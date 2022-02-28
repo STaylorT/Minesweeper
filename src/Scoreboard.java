@@ -13,8 +13,9 @@ public class Scoreboard extends JPanel {
 
     public Scoreboard(int rows, int cols, int numFlags){
         flags = numFlags; // count total flags not placed
-        clock_icon.setSize(30,30);
-        flag_icon.setSize(30,30);
+        flag_icon.setPreferredSize(new Dimension(30,30));
+        clock_icon.setPreferredSize(new Dimension(30,30));
+
 
         // set Scoreboard Dimensions
         this.setSize(30*cols, 100);
@@ -30,7 +31,6 @@ public class Scoreboard extends JPanel {
         elapsedTime = new JLabel("" + time);
         this.add(elapsedTime);
 
-
     }
 
     public int getFlags(){
@@ -38,14 +38,15 @@ public class Scoreboard extends JPanel {
     }
     public void removeFlag(){
         flags--;
-        flags_score.setText("Flags: " + flags);
+        flags_score.setText("" + flags);
     }
     public void addFlag(){
         flags++;
-        flags_score.setText("Flags: " + flags);
+        flags_score.setText("" + flags);
     }
     public void setTime(int newTime){
-        time = time;
+        time = newTime;
+        elapsedTime.setText("" + time);
     }
 
 }
