@@ -21,6 +21,9 @@ public class Grid extends JPanel implements MouseListener {
     private int numUncovered; // number of cells uncovered
     private int targetCellsUncovered;
 
+    // cell size
+    private int CELL_SIZE=30;
+
     // first click bool
     private boolean firstClick;
 
@@ -32,7 +35,6 @@ public class Grid extends JPanel implements MouseListener {
     private Timer elapsedTimer; // timer to count elapsed time each game
 
 
-
     // status of game  0 = Lost  |  1 = Won  | -1 = in game
     private int gameStatus = -1;
 
@@ -42,7 +44,9 @@ public class Grid extends JPanel implements MouseListener {
         return arr;
     }
 
-    public Grid(int rows, int cols, Scoreboard score_board, int flags) {
+    public Grid(int rows, int cols, Scoreboard score_board, int flags, int cellSize) {
+        CELL_SIZE = cellSize;
+
         // initialize variables for new grid
         setUpTimers(); // instantiate timer
         cellGrid = new Cell[rows][cols];
@@ -56,18 +60,15 @@ public class Grid extends JPanel implements MouseListener {
         firstClick = true;
         time=0;
 
-
-
-
         // set this grid layout
         this.setLayout(new GridLayout(rows, cols, 0, 0));
         this.setBackground(Color.black);
-        this.setPreferredSize(new Dimension(numCols*30,numRows*30));
+        this.setPreferredSize(new Dimension(numCols*CELL_SIZE,numRows*CELL_SIZE));
 
         // fill the grid with cell objects
         for (int i = 0; i < rows; i++) { // create rows for grid
             for (int j = 0; j < cols; j++) { // fill each row
-                Cell new_cell = new Cell(i,j, numRows, numCols, scoreboard);
+                Cell new_cell = new Cell(i,j, numRows, numCols, scoreboard, CELL_SIZE);
                 new_cell.addMouseListener((MouseListener)this);
                 cellGrid[i][j] = new_cell;
                 this.add(new_cell);
@@ -122,19 +123,19 @@ public class Grid extends JPanel implements MouseListener {
             }
         }
     }
-    private void gameOver(int code){ // -1 = game over  |  1 = win
+    private void gameOver(int code){ // 0 = game over  |  1 = win
         if (code == -1){
-            System.out.println("GAME OVER");
             elapsedTimer.stop();
             showMines();
+            gameStatus = 0;
         }
         else if(code == 1){
-            System.out.println("YOU WON.");
             elapsedTimer.stop();
+            gameStatus = 1;
         }
     }
 
-    private void showMines(){
+    private void showMines(){ // show all mines and disable the buttons
         for (int i = 0; i < numRows ;i++){
             for (int j = 0;j<numCols ;j++){
                 if (cellGrid[i][j].hasMine()){

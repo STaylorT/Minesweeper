@@ -14,7 +14,11 @@ public class Scoreboard extends JPanel {
     public Scoreboard(int rows, int cols, int numFlags){
         flags = numFlags; // count total flags not placed
         flag_icon.setPreferredSize(new Dimension(30,30));
+        flag_icon.setDisabledIcon(new ImageIcon("images/flag.png"));
         clock_icon.setPreferredSize(new Dimension(30,30));
+        clock_icon.setDisabledIcon(new ImageIcon("images/clock.png"));
+        clock_icon.setEnabled(false);
+        flag_icon.setEnabled(false);
 
 
         // set Scoreboard Dimensions

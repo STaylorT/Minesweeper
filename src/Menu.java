@@ -8,7 +8,7 @@ public class Menu extends JMenuBar
         implements ActionListener, ItemListener, ChangeListener{
     // grid size : 9x9=0  |  16x16=1   | 24x20=2   | custom = 10
     private int gridSize = 0;
-    private int dimensions[] = {0,0,0}; // rows, cols, flags
+    private int dimensions[] = {9,9,10}; // rows, cols, flags
 
     static final int MAX_ROW = 30;
     static final int MAX_COL = 24;
@@ -16,6 +16,8 @@ public class Menu extends JMenuBar
     static final int MIN_COL = 9;
 
     private JButton submit;
+
+    private int menuState;
 
     // sliders
     JSlider cols;
@@ -33,8 +35,9 @@ public class Menu extends JMenuBar
     private static boolean changed;
 
     public Menu(){
+        menuState = 0;
         // create first menu
-        JMenu menu, menu2, submenu, customSubmenu;
+        JMenu menu, menu2, submenu, customSubmenu, submenu2;
         JMenuItem menuItem;
         JRadioButtonMenuItem rbMenuItem;
         JCheckBoxMenuItem cbMenuItem;
@@ -45,6 +48,8 @@ public class Menu extends JMenuBar
         menu.getAccessibleContext().setAccessibleDescription(
                 "Configure game options.");
         this.add(menu);
+
+
 
         //a submenu
         menu.addSeparator();
@@ -138,22 +143,41 @@ public class Menu extends JMenuBar
         cols.setPaintLabels(true);
         rows.setPaintLabels(true);
         mines.setPaintLabels(true);
+        // Quit Button
+        menu.addSeparator();
+        submenu2 = new JMenu("Game");
+        group = new ButtonGroup();
+        rbMenuItem = new JRadioButtonMenuItem("Restart");
+        rbMenuItem.setSelected(false);
+        group.add(rbMenuItem);
+        submenu2.add(rbMenuItem);
+        rbMenuItem.addActionListener(this);
+
+        rbMenuItem = new JRadioButtonMenuItem("Quit");
+        rbMenuItem.setMnemonic(KeyEvent.VK_O);
+        group.add(rbMenuItem);
+        submenu2.add(rbMenuItem);
+        rbMenuItem.addActionListener(this);
+
+        menu.add(submenu2);
 
         // Help Menu
         menu2 = new JMenu("Help");
-        menu.setMnemonic(KeyEvent.VK_A);
-        menu.getAccessibleContext().setAccessibleDescription(
-                "How to play.");
+        menuItem = new JMenuItem("Start by clicking any cell.",
+                KeyEvent.VK_T);
+        JMenuItem menuItem1 = new JMenuItem("A cell with the number X has X mines around that cell.",
+                KeyEvent.VK_T);
+        JMenuItem menuItem2 = new JMenuItem("Use this information to click all cells that ARE NOT mines.",
+                KeyEvent.VK_T);
+        JMenuItem menuItem3 = new JMenuItem("When only mine cells are left, you win!",
+                KeyEvent.VK_T);
+
+        menu2.add(menuItem);
+        menu2.add(menuItem1);
+        menu2.add(menuItem2);
+        menu2.add(menuItem3);
         this.add(menu2);
 
-        // a group of JMenuItems
-        menuItem = new JMenuItem("Help",
-                KeyEvent.VK_T);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(
-                KeyEvent.VK_1, ActionEvent.ALT_MASK));
-        menuItem.getAccessibleContext().setAccessibleDescription(
-                "This doesn't really do anything");
-        menu2.add(menuItem);
 
     }
 
@@ -163,8 +187,6 @@ public class Menu extends JMenuBar
         dimensions[1] = cols.getValue();
         minePercent = mines.getValue() * .01;
         dimensions[2] = (int) (minePercent * dimensions[0] * dimensions[1]);
-        System.out.println("Mines percentage:" + minePercent);
-        System.out.println("Mines num:" + dimensions[2]);
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -176,6 +198,9 @@ public class Menu extends JMenuBar
         if (actionCommand.contains("submit")){
             System.out.println("Submitted");
             gridSize = 10;
+        }
+        if (actionCommand.contains("Quit")){
+            menuState = -1;
         }
         changed = true;
 
@@ -197,11 +222,11 @@ public class Menu extends JMenuBar
             System.out.println("Intermediate Mode Selected");
         }
         else if (actionCommand.contains("(24x20)")){
-            System.out.println("Hard Mode Selected");
-            dimensions[0] = 20;
-            dimensions[1] = 24;
+            dimensions[0] = 24;
+            dimensions[1] = 20;
             dimensions[2] = 99;
             gridSize = 2;
+            System.out.println("Hard Mode Selected");
         }
 
     }
@@ -223,6 +248,9 @@ public class Menu extends JMenuBar
 
     public void setChanged(){
         changed = false;
+    }
+    public int getMenuState(){ // -1 is quit,  1 is restart
+        return menuState;
     }
 
 

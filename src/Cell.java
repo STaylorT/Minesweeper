@@ -3,12 +3,18 @@ import java.awt.*;
 import javax.swing.*;
 //import java.util.ArrayList;
 
+
 public class Cell extends JButton{
     // is cell a mine?
     private boolean mine = false;
     // position on grid
     private int rowPosition;
     private int colPosition;
+
+    private int numRows;
+    private int numCols;
+
+    private int CELL_SIZE;
     // unique id
     private int id = 0;
     private static int ID_COUNT = 0;
@@ -24,12 +30,16 @@ public class Cell extends JButton{
     private ImageIcon noMineCell = new ImageIcon("images/nomine.png");
     private ImageIcon numberIcons[];
 
-    public Cell(int row_pos, int col_pos, int num_rows, int num_cols, Scoreboard score_board){
+    public Cell(int row_pos, int col_pos, int num_rows, int num_cols, Scoreboard score_board, int cellSize){
         rowPosition = row_pos;
         colPosition = col_pos;
+        numCols = num_cols;
+        numRows = num_rows;
         scoreboard = score_board;
+        CELL_SIZE= cellSize;
         this.setBackground(Color.gray);
         setUpIcons();
+
         this.setIcon(defaultIcon);
         // set id's for cells
         ID_COUNT++;
@@ -41,9 +51,23 @@ public class Cell extends JButton{
     // set number icons 1-8 in array
     private void setUpIcons(){
         numberIcons = new ImageIcon[8];
+        if (CELL_SIZE < 30){
+            resizeImages(CELL_SIZE);
+            return;
+        }
         for (int i=0 ; i< numberIcons.length ; i++){
             int b = i+1;
             numberIcons[i] = new ImageIcon("images/" + b + ".png");
+        }
+    }
+    private void resizeImages(int cellSize){
+        defaultIcon = new ImageIcon(((new ImageIcon("images/square.png")).getImage()).getScaledInstance(cellSize, cellSize, java.awt.Image.SCALE_SMOOTH));
+        mineIcon = new ImageIcon(((new ImageIcon("images/bomb.png")).getImage()).getScaledInstance(cellSize, cellSize, java.awt.Image.SCALE_SMOOTH));
+        flagIcon = new ImageIcon(((new ImageIcon("images/flag.png")).getImage()).getScaledInstance(cellSize, cellSize, java.awt.Image.SCALE_SMOOTH));
+        noMineCell = new ImageIcon(((new ImageIcon("images/nomine.png")).getImage()).getScaledInstance(cellSize, cellSize, java.awt.Image.SCALE_SMOOTH));
+        for (int i=0 ; i< numberIcons.length ; i++){
+            int b = i+1;
+            numberIcons[i] = new ImageIcon(((new ImageIcon("images/" + b + ".png")).getImage()).getScaledInstance(cellSize, cellSize, java.awt.Image.SCALE_SMOOTH));
         }
     }
 
